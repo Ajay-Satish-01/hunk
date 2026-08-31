@@ -316,7 +316,7 @@ describe("CLI entrypoint contracts", () => {
       expect(proc.exitCode).toBe(1);
       expect(stdout).toBe("");
       expect(stderr).toContain("hunk: `hunk diff` must be run inside a Git repository.");
-      expect(stderr).toContain("hunk diff <before-file> <after-file>");
+      expect(stderr).toContain("hunk diff --files <before-file> <after-file>");
       expect(stderr).not.toContain("at runGitText");
       expect(stderr).not.toContain("loadGitChangeset");
       expect(stderr).not.toContain("Bun v");
@@ -484,7 +484,9 @@ describe("CLI entrypoint contracts", () => {
       );
 
       expect(proc.exitCode).toBe(0);
-      expect(Buffer.from(proc.stdout).toString("utf8")).toMatch(/^\d+\.\d+\.\d+\n$/);
+      expect(Buffer.from(proc.stdout).toString("utf8")).toMatch(
+        /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?\n$/,
+      );
       expect(Buffer.from(proc.stderr).toString("utf8")).toBe("preparing\n");
     } finally {
       rmSync(root, { recursive: true, force: true });
