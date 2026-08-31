@@ -29,14 +29,14 @@ below its lowercase-kebab top-level name:
 
 ```ts
 hunk.registerCliCommand(
-  { name: 'greptile', summary: 'Work with Greptile', usage: '<sync|review>' },
+  { name: "greptile", summary: "Work with Greptile", usage: "<sync|review>" },
   async (args, ctx) => {
-    if (args[0] === 'sync') {
-      await ctx.stdout.write('Synced.\n');
-      return { kind: 'exit' };
+    if (args[0] === "sync") {
+      await ctx.stdout.write("Synced.\n");
+      return { kind: "exit" };
     }
-    await ctx.stderr.write('Preparing review…\n');
-    return { kind: 'delegate', argv: ['diff'] };
+    await ctx.stderr.write("Preparing review…\n");
+    return { kind: "delegate", argv: ["diff"] };
   },
 );
 ```
@@ -83,7 +83,7 @@ Request host behavior for the review session loading the extension. Training,
 demo, and presentation extensions can make their view-setting changes temporary:
 
 ```ts
-hunk.configureSession({ viewPreferences: 'transient' });
+hunk.configureSession({ viewPreferences: "transient" });
 ```
 
 If any loaded extension requests this, Hunk skips the save-view-preferences
@@ -96,11 +96,11 @@ Contribute one selectable theme. The object is the same shape as a `[themes.<id>
 
 ```ts
 hunk.registerTheme({
-  id: 'midnight-review',
-  label: 'Midnight Review',
-  base: 'catppuccin-mocha',
-  accent: '#7fd1ff',
-  syntaxScopes: { 'keyword.operator': '#7fd1ff' },
+  id: "midnight-review",
+  label: "Midnight Review",
+  base: "catppuccin-mocha",
+  accent: "#7fd1ff",
+  syntaxScopes: { "keyword.operator": "#7fd1ff" },
 });
 ```
 
@@ -111,11 +111,11 @@ Theme ids are lowercase words separated by `-` or `_` and cannot reuse a built-i
 Map an extension, exact filename, or glob to an existing syntax-highlighting language. A string remains shorthand for a case-insensitive extension; object-form extension values receive the same trimming, leading-dot removal, and lowercasing:
 
 ```ts
-hunk.registerFileLanguage('.zig', 'zig');
-hunk.registerFileLanguage({ kind: 'filename', value: 'BUILD' }, 'python');
+hunk.registerFileLanguage(".zig", "zig");
+hunk.registerFileLanguage({ kind: "filename", value: "BUILD" }, "python");
 hunk.registerFileLanguage(
-  { kind: 'glob', value: 'generated/**/*.proto', target: 'path' },
-  'protobuf',
+  { kind: "glob", value: "generated/**/*.proto", target: "path" },
+  "protobuf",
 );
 ```
 
@@ -149,10 +149,10 @@ Mark character ranges inside Hunk's own diff rendering — search hits, diagnost
 
 ```ts
 hunk.registerLineHighlighter({
-  id: 'todos',
+  id: "todos",
   highlight({ file }) {
     // Scan file.patch (or a readDocument result) and return marks.
-    return [{ side: 'new', line: 12, range: [4, 8], tone: 'warning' }];
+    return [{ side: "new", line: 12, range: [4, 8], tone: "warning" }];
   },
 });
 ```
@@ -178,7 +178,7 @@ Rewrite the loaded changeset before it reaches the review UI. Transforms run in 
 ```ts
 hunk.transformChangeset((changeset) => ({
   ...changeset,
-  files: changeset.files.filter((file) => !file.path.endsWith('.lock')),
+  files: changeset.files.filter((file) => !file.path.endsWith(".lock")),
 }));
 ```
 
@@ -194,22 +194,19 @@ Register a session-wide, deliberately activated keyboard interpretation. Modes r
 
 ```ts
 hunk.registerKeyboardMode({
-  id: 'normal',
-  title: 'Vim navigation',
+  id: "normal",
+  title: "Vim navigation",
   onKey(key, ctx) {
-    if (key.sequence !== 'j') return 'pass';
-    ctx.commands.execute('hunk.review.stepDown');
-    return 'handled';
+    if (key.sequence !== "j") return "pass";
+    ctx.commands.execute("hunk.review.stepDown");
+    return "handled";
   },
 });
 
-hunk.registerCommand(
-  { id: 'vim', title: 'Toggle Vim navigation', key: 'ctrl+v' },
-  (ctx) => {
-    if (ctx.keyboardModes.isActive('normal')) ctx.keyboardModes.exitMode();
-    else ctx.keyboardModes.enterMode('normal');
-  },
-);
+hunk.registerCommand({ id: "vim", title: "Toggle Vim navigation", key: "ctrl+v" }, (ctx) => {
+  if (ctx.keyboardModes.isActive("normal")) ctx.keyboardModes.exitMode();
+  else ctx.keyboardModes.enterMode("normal");
+});
 ```
 
 `onKey` returns `"handled"`, `"pass"`, or `"exit"` synchronously. Optional `onEnter`/`onExit` callbacks reset extension-owned state such as counts and pending sequences; while either lifecycle callback runs, `enterMode()` and `exitMode()` return `false`. The context exposes only `cwd`, `notify`, public `commands`, activation-scoped `keyboardModes` controls, and `highlights` refresh controls. Those controls become inert on exit, so retained callbacks cannot replace a later mode. When the session mode is the highest-priority input owner, host-owned Escape exits it; the persistent status badge and Extensions-menu exit are clickable too.
@@ -221,15 +218,12 @@ One session mode runs at a time. Entering another runs the outgoing `onExit` fir
 Register a named command, optionally bound to a key. Commands are the same mechanism Hunk's own shortcuts dispatch through — one table, one loop, built-ins first.
 
 ```ts
-import type { HunkExtensionAPI } from 'hunkdiff/extension';
+import type { HunkExtensionAPI } from "hunkdiff/extension";
 
 export default function (hunk: HunkExtensionAPI) {
-  hunk.registerCommand(
-    { id: 'hello', title: 'Say hello', key: 'ctrl+g' },
-    (ctx) => {
-      ctx.notify('hello from a command');
-    },
-  );
+  hunk.registerCommand({ id: "hello", title: "Say hello", key: "ctrl+g" }, (ctx) => {
+    ctx.notify("hello from a command");
+  });
 }
 ```
 
@@ -255,17 +249,15 @@ The handler fires when the key is pressed outside modal UI (dialogs, menus, and 
 
 ```ts
 hunk.registerCommand(
-  { id: 'show-selection', title: 'Show the selected file', key: 'ctrl+y' },
+  { id: "show-selection", title: "Show the selected file", key: "ctrl+y" },
   (ctx) => {
     const { file, hunkIndex } = ctx.selection;
     if (!file) {
-      ctx.notify('No file selected');
+      ctx.notify("No file selected");
       return;
     }
 
-    ctx.notify(
-      hunkIndex === null ? file.path : `${file.path} — hunk ${hunkIndex + 1}`,
-    );
+    ctx.notify(hunkIndex === null ? file.path : `${file.path} — hunk ${hunkIndex + 1}`);
   },
 );
 ```
@@ -298,7 +290,7 @@ A handler may be async; a failure becomes a warning naming your extension.
 
 ```ts
 hunk.registerCommand(
-  { id: 'reformat', title: 'Reformat the selected file', key: 'ctrl+r' },
+  { id: "reformat", title: "Reformat the selected file", key: "ctrl+r" },
   async (ctx) => {
     const file = ctx.selection.file;
     if (!file) {
@@ -307,11 +299,11 @@ hunk.registerCommand(
 
     const proceed = await ctx.dialogs.confirm({
       title: `Reformat ${file.path}?`,
-      body: 'The file is rewritten in place.',
-      confirmLabel: 'reformat',
+      body: "The file is rewritten in place.",
+      confirmLabel: "reformat",
     });
 
-    ctx.notify(proceed ? `Reformatting ${file.path}` : 'Left it alone');
+    ctx.notify(proceed ? `Reformatting ${file.path}` : "Left it alone");
   },
 );
 ```
@@ -319,28 +311,22 @@ hunk.registerCommand(
 `select` fits acting on part of the selection — asking which hunk to jump to, then navigating there:
 
 ```ts
-hunk.registerCommand(
-  { id: 'pick-hunk', title: 'Pick a hunk', key: 'ctrl+k' },
-  async (ctx) => {
-    const file = ctx.selection.file;
-    const hunks = file?.hunks ?? [];
-    if (!file || hunks.length === 0) {
-      ctx.notify('Nothing to pick from', 'warning');
-      return;
-    }
+hunk.registerCommand({ id: "pick-hunk", title: "Pick a hunk", key: "ctrl+k" }, async (ctx) => {
+  const file = ctx.selection.file;
+  const hunks = file?.hunks ?? [];
+  if (!file || hunks.length === 0) {
+    ctx.notify("Nothing to pick from", "warning");
+    return;
+  }
 
-    const labels = hunks.map((hunk) => hunk.header || `hunk ${hunk.index + 1}`);
-    const picked = await ctx.dialogs.select({
-      title: 'Which hunk?',
-      options: labels,
-    });
+  const labels = hunks.map((hunk) => hunk.header || `hunk ${hunk.index + 1}`);
+  const picked = await ctx.dialogs.select({ title: "Which hunk?", options: labels });
 
-    // `navigation` is live, so the jump is valid even after awaiting the dialog.
-    if (picked !== null) {
-      ctx.navigation.selectHunk(file.id, labels.indexOf(picked));
-    }
-  },
-);
+  // `navigation` is live, so the jump is valid even after awaiting the dialog.
+  if (picked !== null) {
+    ctx.navigation.selectHunk(file.id, labels.indexOf(picked));
+  }
+});
 ```
 
 Hunk draws the dialog; your text fills the title, body, and choices. Dialogs from installed extensions carry an `ext <your-id>` attribution line — the same marker `notify` toasts use — so a third-party prompt cannot present itself as Hunk asking. Hunk's own bundled extensions omit that redundant marker.
@@ -360,12 +346,9 @@ One dialog shows at a time; concurrent requests queue in call order, across exte
 ```ts
 const file = ctx.selection.file;
 if (file && ctx.workspace.canWriteDocument(file.id)) {
-  const text = await ctx.workspace.readDocument(file.id, 'new');
+  const text = await ctx.workspace.readDocument(file.id, "new");
   if (text !== null) {
-    await ctx.workspace.writeDocument({
-      fileId: file.id,
-      text: transform(text),
-    });
+    await ctx.workspace.writeDocument({ fileId: file.id, text: transform(text) });
   }
 }
 ```
@@ -400,9 +383,8 @@ Subscribe to a lifecycle or UI event. Handlers may be async; Hunk never blocks t
 
 - A newly mounted instance receives `startup` before its first `changeset_loaded`; reloads deliver `changeset_loaded` before `session_reload` after the matching review commits.
 - `selection_changed` is trailing-debounced: holding `[`/`]` retargets many times a second, and handlers only care where the user landed. `fileId` and `hunkIndex` are `null` when nothing is selected.
-- `command_executed` reports stable command ids after terminal dispatch from a key, menu, or `ctx.commands.execute`. Detached async extension work may still be running; the event observes the accepted action rather than promise settlement. It follows remapped keys; browser/session review intents and widget-owned Escape, Enter, and F10 menu navigation are not terminal commands. The note composer's save shortcut is `hunk.review.saveNote` and does emit this event.
 - `hunk_viewed` fires when the settled `(file, hunk)` pair changes, including `[`/`]` inside one file. Current-line movement within a hunk does not emit it. `file_viewed` still fires only when the selected file object changes.
-- `command_executed` reports stable command ids after terminal dispatch from a key, menu, or `ctx.commands.execute`. Detached async extension work may still be running; the event observes the accepted action rather than promise settlement. It follows remapped keys; browser/session review intents and widget-owned Escape, Enter, note-editor Ctrl-S, and F10 menu navigation are not terminal commands.
+- `command_executed` reports stable command ids after terminal dispatch from a key, menu, or `ctx.commands.execute`. Detached async extension work may still be running; the event observes the accepted action rather than promise settlement. It follows remapped keys; browser/session review intents and widget-owned Escape, Enter, and F10 menu navigation are not terminal commands. The note composer's save shortcut is `hunk.review.saveNote` and does emit this event.
 - `session_reload`'s `reason` is `"watch"`, `"daemon"` (an agent command through the session broker), or `"manual"`.
 - `note_created` and `note_edited` cover notes authored in Hunk's own UI this session. Agent session comments do not emit them, and a reload may remap or drop notes. Use them for incremental reactions.
 - `note_changed` is store-backed: `kind` is `"created"`, `"updated"`, or `"removed"`, and `note` matches `ctx.review.snapshot()`. It includes agent session comments and user deletes; drafts never appear. Reloads that remap notes do not emit it — use `session_reload` plus `ctx.review.snapshot()` for the complete current record.
@@ -413,16 +395,16 @@ Subscribe to a lifecycle or UI event. Handlers may be async; Hunk never blocks t
 A small bus shared by every loaded extension, for coordinating without coupling through global state. Namespace event names with your extension id. Delivery is fire-and-forget; events emitted while factories are still loading are queued until every extension has subscribed.
 
 ```ts
-import type { HunkExtensionAPI } from 'hunkdiff/extension';
+import type { HunkExtensionAPI } from "hunkdiff/extension";
 
 export default function (hunk: HunkExtensionAPI) {
-  hunk.events.on<{ fileCount: number }>('summary:ready', (payload, ctx) => {
-    if (payload.fileCount > 100) ctx.panes.open('summary');
+  hunk.events.on<{ fileCount: number }>("summary:ready", (payload, ctx) => {
+    if (payload.fileCount > 100) ctx.panes.open("summary");
   });
 
-  hunk.on('changeset_loaded', ({ changeset }, ctx) => {
-    hunk.events.emit('summary:ready', { fileCount: changeset.files.length });
-    ctx.panes.open('summary');
+  hunk.on("changeset_loaded", ({ changeset }, ctx) => {
+    hunk.events.emit("summary:ready", { fileCount: changeset.files.length });
+    ctx.panes.open("summary");
   });
 }
 ```
@@ -442,7 +424,7 @@ patterns = ["*.lock", "dist/**"]
 ```
 
 ```ts
-const patterns = (hunk.config.patterns as string[] | undefined) ?? ['*.lock'];
+const patterns = (hunk.config.patterns as string[] | undefined) ?? ["*.lock"];
 ```
 
 ## `ctx.notify(message, type?)`
